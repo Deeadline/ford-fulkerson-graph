@@ -99,28 +99,8 @@ let edge = (source, destination, weight) => {
 let graph = {
   source: "",
   sink: "",
-  nodes: [
-    node("0", 20, 150),
-    node("1", 100, 100),
-    node("2", 200, 100),
-    node("3", 150, 150),
-    node("4", 100, 200),
-    node("5", 200, 200),
-    node("6", 250, 150)
-  ],
-  edges: [
-    edge("0", "1", 9),
-    edge("0", "4", 9),
-    edge("1", "2", 7),
-    edge("1", "3", 3),
-    edge("2", "6", 6),
-    edge("2", "3", 4),
-    edge("3", "5", 2),
-    edge("3", "6", 9),
-    edge("4", "3", 3),
-    edge("4", "5", 6),
-    edge("5", "6", 8)
-  ]
+  nodes: [],
+  edges: []
 };
 export default {
   name: "app",
@@ -351,6 +331,9 @@ export default {
   justify-content: center;
   width: 100%;
 }
+ul {
+  list-style: none;
+}
 .result {
   display: flex;
   flex-direction: column;
@@ -377,8 +360,12 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-svg {
+.svg-container {
+  display: flex;
   width: 800px;
+}
+svg {
+  flex: 1 1 100%;
   height: 600px;
   border: solid black 1px;
   circle.node {
