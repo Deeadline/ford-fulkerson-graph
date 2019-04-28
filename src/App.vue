@@ -16,7 +16,7 @@
             <path d="M0,0 L0,6 L9,3 z" fill="#000"></path>
           </marker>
         </defs>
-        <g v-for="(node, i) in graph.nodes" :key="`node-${i}`" @mousedown="nMove($event,node)">
+        <g v-for="(node, i) in graph.nodes" :key="`node-${i}`" @mousedown="handleMove($event,node)">
           <circle
             :cx="node.x"
             :cy="node.y"
@@ -117,25 +117,28 @@ export default {
   },
   computed: {
     connections() {
-      return this.graph.edges.map(edge => {
-        let from = this.getNode(edge.source);
-        let to = this.getNode(edge.destination);
-        let angle = Math.atan2(from.y - to.y, from.x - to.x);
-        let pathFrom = [
+      return this.graph.edges.map(({ source, destination, weight }) => {
+        const from = this.getNode(source);
+        const to = this.getNode(destination);
+        const angle = Math.atan2(from.y - to.y, from.x - to.x);
+        const pathFrom = [
           from.x - Math.cos(angle) * this.radius,
           from.y - Math.sin(angle) * this.radius
         ];
-        let pathTo = [
+        const pathTo = [
           to.x + Math.cos(angle) * this.radius,
           to.y + Math.sin(angle) * this.radius
         ];
-        let c = [(pathFrom[0] + pathTo[0]) / 2, (pathFrom[1] + pathTo[1]) / 2];
-        let tr = this.labelPos(angle);
+        const center = [
+          (pathFrom[0] + pathTo[0]) / 2,
+          (pathFrom[1] + pathTo[1]) / 2
+        ];
+        const label = this.labelPos(angle);
         return {
           from: pathFrom,
           to: pathTo,
-          center: [c[0] + tr[0], c[1] + tr[1]],
-          label: edge.weight
+          center: [center[0] + label[0], center[1] + label[1]],
+          label: weight
         };
       });
     },
@@ -172,14 +175,8 @@ export default {
     this.move = move.bind(this);
   },
   methods: {
-    nMove(ev, node) {
-      this.dragging = node;
-      this.last = { x: ev.clientX, y: ev.clientY };
-      window.document.addEventListener("mousemove", this.move);
-      window.document.addEventListener("mouseup", this.up);
-    },
     labelPos(angle) {
-      let abs = Math.abs(angle);
+      const abs = Math.abs(angle);
       if (abs > Math.PI / 4 && abs < (Math.PI * 3) / 4) {
         return [6, 0];
       }
@@ -187,6 +184,12 @@ export default {
     },
     getNode(label) {
       return this.graph.nodes.find(i => i.label === label);
+    },
+    handleMove(ev, node) {
+      this.dragging = node;
+      this.last = { x: ev.clientX, y: ev.clientY };
+      window.document.addEventListener("mousemove", this.move);
+      window.document.addEventListener("mouseup", this.up);
     },
     removeNode(label, i) {
       this.graph.nodes.splice(i, 1);
@@ -363,40 +366,40 @@ ul {
 .svg-container {
   display: flex;
   width: 800px;
-}
-svg {
-  flex: 1 1 100%;
-  height: 600px;
-  border: solid black 1px;
-  circle.node {
-    user-select: none;
-    stroke-width: 3;
-    stroke: black;
-    fill: #ccc;
-    transition: fill 1s;
-    &.source {
-      fill: rgb(206, 88, 33);
+  svg {
+    flex: 1 1 100%;
+    height: 600px;
+    border: solid black 1px;
+    circle.node {
+      user-select: none;
+      stroke-width: 3;
+      stroke: black;
+      fill: #ccc;
+      transition: fill 1s;
+      &.source {
+        fill: rgb(206, 88, 33);
+      }
+      &.sink {
+        fill: rgba(86, 144, 231, 0.795);
+      }
     }
-    &.sink {
-      fill: rgba(86, 144, 231, 0.795);
+    circle.hl {
+      fill: #aaa;
+      transition: transform 1s;
     }
-  }
-  circle.hl {
-    fill: #aaa;
-    transition: transform 1s;
-  }
-  text {
-    user-select: none;
-    fill: black;
-    text-anchor: middle;
-    font-weight: 600;
-  }
-  line {
-    stroke: black;
-    stroke-width: 1;
-  }
-  .disable {
-    display: none;
+    text {
+      user-select: none;
+      fill: black;
+      text-anchor: middle;
+      font-weight: 600;
+    }
+    line {
+      stroke: black;
+      stroke-width: 1;
+    }
+    .disable {
+      display: none;
+    }
   }
 }
 </style>
